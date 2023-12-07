@@ -15,6 +15,9 @@
         android:theme="@style/Theme.UASPAPB"
         tools:targetApi="31">
         <activity
+            android:name=".authentication.AuthenticationActivity"
+            android:exported="false" />
+        <activity
             android:name=".user.HomeUserActivity"
             android:exported="false" />
         <activity

@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".authentication.LoginActivity">
+    tools:context=".authentication.AuthenticationActivity">
 
     <TextView
         android:id="@id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="Login Admin"
+        android:text="Register"
         android:textSize="25sp"
         android:fontFamily="@font/poppinsbold"
         android:textColor="@color/text_primary"
@@ -19,7 +19,6 @@
         />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -28,12 +27,11 @@
 
         <ImageView
             android:id="@+id/ivLogo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/cryptoclub"
+            android:layout_width="177dp"
+            android:layout_height="140dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="50sp"
-            />
+            android:layout_marginBottom="35sp"
+            android:src="@drawable/cryptoclub" />
 
         <EditText
             android:id="@+id/etEmail"
@@ -57,19 +55,30 @@
             android:paddingHorizontal="15sp"
             />
 
+        <EditText
+            android:id="@+id/etRePassword"
+            android:layout_width="match_parent"
+            android:layout_height="45sp"
+            android:layout_below="@id/etPassword"
+            android:background="@drawable/rounded_bg_edittext"
+            android:hint="Re-Password"
+            android:inputType="textPassword"
+            android:layout_marginVertical="15sp"
+            android:paddingHorizontal="15sp"
+            />
 
         <Button
-            android:id="@+id/btnLogin"
+            android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/button_primary"
-            android:layout_below="@id/etPassword"
-            android:text="Login"
+            android:layout_below="@id/etRePassword"
+            android:text="Register"
             android:textSize="15sp"
             android:textStyle="bold"
             android:fontFamily="@font/poppinssemibold"
             android:paddingVertical="10dp"
-            android:layout_marginTop="40sp"
+            android:layout_marginTop="15sp"
             />
 
     </RelativeLayout>

@@ -17,4 +17,16 @@ class Helper(context: Context) {
         val status = sharedPreferences.getString("status", null)
         return status
     }
+
+    fun setUsername(username: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString("username", username)
+        editor.apply()
+    }
+
+    fun getUsername(): String? {
+        val username = sharedPreferences.getString("username", null)
+        return username
+    }
+
 }

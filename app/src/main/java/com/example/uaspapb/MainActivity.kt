@@ -3,6 +3,7 @@ package com.example.uaspapb
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.uaspapb.authentication.AuthenticationActivity
 import com.example.uaspapb.authentication.LoginActivity
 import com.example.uaspapb.databinding.ActivityMainBinding
 
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
                 val helper = Helper(this@MainActivity)
                 helper.setStatus("user")
 
-                startActivity(Intent(this@MainActivity,LoginActivity::class.java))
+                startActivity(Intent(this@MainActivity,AuthenticationActivity::class.java))
             }
         }
     }

@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
 import android.widget.Toast
 import com.example.uaspapb.Helper
 import com.example.uaspapb.admin.HomeAdminActivity
@@ -30,21 +31,9 @@ class LoginActivity : AppCompatActivity() {
         //Helper
         helper = Helper(this@LoginActivity)
 
-        //Check apakah milih Admin/User
-        val loginStatus = helper.getStatus()
-        if(loginStatus == "admin") {
-            binding.tvTitle.text = "Login Admin"
-        }else{
-            binding.tvTitle.text = "Login User"
-        }
-
         with(binding) {
             email = etEmail.text.toString()
             password = etPassword.text.toString()
-
-            btnRegister.setOnClickListener {
-                startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
-            }
 
             btnLogin.setOnClickListener {
                 if(checkInputField()) {
@@ -53,11 +42,7 @@ class LoginActivity : AppCompatActivity() {
                         val status = helper.getStatus()
 
                         val currentUser = auth.currentUser
-                        if(status == "admin") {
-                            isAdmin(currentUser)
-                        }else{
-                            isUser(currentUser)
-                        }
+                        isAdmin(currentUser)
                     }
                 }else {
                     Toast.makeText(this@LoginActivity, "Check all the input!", Toast.LENGTH_SHORT).show()
@@ -82,27 +67,6 @@ class LoginActivity : AppCompatActivity() {
                         finish()
                     }else {
                         Toast.makeText(this@LoginActivity, "Admin Account Not Found", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-    }
-
-    private fun isUser(user: FirebaseUser?) {
-        val firebase = FirebaseFirestore.getInstance()
-        firebase.collection("users").document(user!!.uid)
-            .get().addOnSuccessListener {
-                    document ->
-                if(document != null && document.exists()) {
-                    val userData = document.data!!
-
-                    val role = userData["role"] as String
-                    if(role == "user") {
-                        Toast.makeText(this@LoginActivity, "Login Success", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this@LoginActivity, HomeUserActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    }else {
-                        Toast.makeText(this@LoginActivity, "User Account Not Found", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.uaspapb.Helper
+import com.example.uaspapb.MainActivity
 import com.example.uaspapb.R
 import com.example.uaspapb.databinding.ActivityHomeAdminBinding
 import com.example.uaspapb.databinding.FragmentLoginBinding
@@ -88,8 +89,7 @@ class LoginFragment : Fragment() {
                         Toast.makeText(requireContext(), "Login Success", Toast.LENGTH_SHORT).show()
                         val intent = Intent(requireContext(), HomeUserActivity::class.java)
                         startActivity(intent)
-                        activity?.finish()
-
+                        activity?.finishAffinity()
                     }else {
                         Toast.makeText(requireContext(), "User Account Not Found", Toast.LENGTH_SHORT).show()
                     }

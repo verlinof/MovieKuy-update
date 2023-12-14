@@ -21,7 +21,7 @@ class HomeUserActivity : AppCompatActivity() {
                 when(it.itemId) {
                     R.id.itemDashboard -> replaceFragment(DashboardFragmentUser())
                     R.id.itemBookmark -> replaceFragment(DashboardFragmentUser())
-                    R.id.itemProfile -> replaceFragment(DashboardFragmentUser())
+                    R.id.itemProfile -> replaceFragment(ProfileFragmentUser())
                     else -> {}
                 }
                 true

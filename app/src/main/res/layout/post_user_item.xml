@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/postContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        >
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardPostImage"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:cardCornerRadius="15dp"
+            >
+            <ImageView
+                android:id="@+id/postImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/postTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/cardPostImage"
+            android:text="Title"
+            android:textSize="18dp"
+            android:fontFamily="@font/poppinssemibold"
+            />
+
+        <TextView
+            android:id="@+id/postDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Descriptionnnnn"
+            android:fontFamily="@font/poppinsregular"
+            android:layout_below="@id/postTitle"
+            />
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnBookmark"
+        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_height="wrap_content"
+        android:text="Add to Bookmark"
+        android:fontFamily="@font/poppinssemibold"
+        android:backgroundTint="@color/button_primary"
+        android:layout_below="@id/postContainer"
+        />
+
+</RelativeLayout>

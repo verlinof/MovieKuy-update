@@ -63,6 +63,7 @@ class RegisterFragment : Fragment() {
     private fun setRole(user: FirebaseUser) {
         val userData = HashMap<String, Any>()
         userData["email"] = binding.etEmail.text.toString()
+        userData["username"] = binding.etUsername.text.toString()
         userData["role"] = helper.getStatus().toString()
 
         val firebase = FirebaseFirestore.getInstance()
@@ -86,6 +87,10 @@ class RegisterFragment : Fragment() {
             }
             if(!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 etEmail.error = "Check Email Format"
+            }
+            if(etUsername.text.toString() == "") {
+                etUsername.error = "This Field is Required"
+                return false
             }
             if(etPassword.text.toString() == "") {
                 etPassword.error = "This Field is Required"

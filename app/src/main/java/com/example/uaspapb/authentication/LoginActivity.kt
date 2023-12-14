@@ -3,13 +3,11 @@ package com.example.uaspapb.authentication
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Patterns
-import android.view.View
 import android.widget.Toast
 import com.example.uaspapb.Helper
-import com.example.uaspapb.admin.HomeAdminActivity
+import com.example.uaspapb.MainActivity
+import com.example.uaspapb.admin.DashboardAdminActivity
 import com.example.uaspapb.databinding.ActivityLoginBinding
-import com.example.uaspapb.user.HomeUserActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
@@ -48,6 +46,9 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this@LoginActivity, "Check all the input!", Toast.LENGTH_SHORT).show()
                 }
             }
+            btnBack.setOnClickListener {
+                finish()
+            }
         }
     }
 
@@ -62,13 +63,15 @@ class LoginActivity : AppCompatActivity() {
                     val role = userData["role"] as String
                     if(role == "admin") {
                         Toast.makeText(this@LoginActivity, "Login Success", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this@LoginActivity, HomeAdminActivity::class.java)
+                        val intent = Intent(this@LoginActivity, DashboardAdminActivity::class.java)
                         startActivity(intent)
-                        finish()
+                        finishAffinity()
                     }else {
                         Toast.makeText(this@LoginActivity, "Admin Account Not Found", Toast.LENGTH_SHORT).show()
                     }
                 }
+            }.addOnFailureListener {
+                Toast.makeText(this@LoginActivity, "Error : $it", Toast.LENGTH_SHORT).show()
             }
     }
 

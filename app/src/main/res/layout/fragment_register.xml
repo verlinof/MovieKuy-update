@@ -44,10 +44,21 @@
             />
 
         <EditText
-            android:id="@+id/etPassword"
+            android:id="@+id/etUsername"
             android:layout_width="match_parent"
             android:layout_height="45sp"
             android:layout_below="@id/etEmail"
+            android:background="@drawable/rounded_bg_edittext"
+            android:hint="Username"
+            android:layout_marginTop="15sp"
+            android:paddingHorizontal="15sp"
+            />
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="45sp"
+            android:layout_below="@id/etUsername"
             android:background="@drawable/rounded_bg_edittext"
             android:hint="Password"
             android:inputType="textPassword"

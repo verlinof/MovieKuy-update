@@ -5,4 +5,5 @@
     <color name="red">#DF1818</color>
     <color name="text_primary">#60A2FD</color>
     <color name="button_primary">#5396F1</color>
+    <color name="grey_primary">#ECECEC</color>
 </resources>

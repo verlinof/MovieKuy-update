@@ -19,7 +19,7 @@ class UploadAdminActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUploadAdminBinding
     private lateinit var storageReference: StorageReference
     private val fireStore = FirebaseFirestore.getInstance()
-    private var uri: Uri? = Uri.parse("")
+    private var uri: Uri? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUploadAdminBinding.inflate(layoutInflater)
@@ -37,6 +37,10 @@ class UploadAdminActivity : AppCompatActivity() {
             btnUpload.setOnClickListener {
                 loadingBar.visibility = View.VISIBLE
                 uploadData()
+            }
+            btnBack.setOnClickListener {
+                startActivity(Intent(this@UploadAdminActivity, DashboardAdminActivity::class.java))
+                finishAffinity()
             }
         }
     }
@@ -77,7 +81,8 @@ class UploadAdminActivity : AppCompatActivity() {
                     }
                 binding.loadingBar.visibility = View.INVISIBLE
                 Toast.makeText(this@UploadAdminActivity, "Upload Success", Toast.LENGTH_SHORT).show()
-                finish()
+                startActivity(Intent(this@UploadAdminActivity, DashboardAdminActivity::class.java))
+                finishAffinity()
             }
         }
     }

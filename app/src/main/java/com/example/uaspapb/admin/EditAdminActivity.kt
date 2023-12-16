@@ -52,7 +52,6 @@ class EditAdminActivity : AppCompatActivity() {
     }
 
     //Function
-
     //Open Image Gallery
     val pickImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             result ->

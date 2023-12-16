@@ -1,24 +1,34 @@
 package com.example.uaspapb.admin
 
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.Window
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.uaspapb.MainActivity
+import com.example.uaspapb.R
 import com.example.uaspapb.databinding.ActivityHomeAdminBinding
+import com.example.uaspapb.databinding.LayoutCustomDialogBinding
 import com.example.uaspapb.model.Post
 import com.example.uaspapb.user.PostAdapterAdmin
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
 class DashboardAdminActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeAdminBinding
     private val auth = Firebase.auth
     private val currentUser = auth.currentUser
     private val firestore = FirebaseFirestore.getInstance()
+    private val storage = FirebaseStorage.getInstance()
     private var postList: ArrayList<Post> = ArrayList<Post>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +70,7 @@ class DashboardAdminActivity : AppCompatActivity() {
                 }
 
                 override fun onDeleteClick(position: Int) {
+                    showCustomDialog(position)
                 }
 
             })
@@ -99,5 +110,53 @@ class DashboardAdminActivity : AppCompatActivity() {
             .addOnFailureListener {exception ->
                 Toast.makeText(this@DashboardAdminActivity, "Error : $exception", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun deletePost(position: Int) {
+        val id = postList[position].id
+        val imageUrl = postList[position].postImage
+
+        firestore.collection("posts").document(id)
+            .delete()
+            .addOnSuccessListener {
+                storage.getReferenceFromUrl(imageUrl)
+                    .delete()
+                    .addOnSuccessListener {
+                        Toast.makeText(this@DashboardAdminActivity, "Delete Post Success", Toast.LENGTH_SHORT).show()
+                        //Refresh Activity
+                        finish()
+                        startActivity(intent)
+                        //Remove Loading Bar
+                        binding.loadingBar.visibility = View.INVISIBLE
+                    }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this@DashboardAdminActivity, "Error $it", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    //Dialog Alert buat Delete Post
+    private fun showCustomDialog(position: Int) {
+        val bindingDialog = LayoutCustomDialogBinding.inflate(layoutInflater)
+
+        val dialog = Dialog(this@DashboardAdminActivity)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(bindingDialog.root)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        bindingDialog.tvTitle.text = "Delete Alert"
+        bindingDialog.tvMessage.text = "Are you sure want to delete this post?"
+
+        bindingDialog.btnYes.setOnClickListener {
+            deletePost(position)
+            dialog.dismiss()
+            binding.loadingBar.visibility = View.VISIBLE
+        }
+        bindingDialog.btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }

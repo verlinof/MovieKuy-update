@@ -1,5 +1,6 @@
 package com.example.uaspapb.user
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -36,14 +37,9 @@ class DashboardFragmentUser : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        //Get User Detail
-        getUserCredential()
 
         binding = FragmentDashboardUserBinding.inflate(inflater)
         with(binding) {
-            //Firebase
-            fetchData()
-
             //RecyclerView
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.setHasFixedSize(true)
@@ -53,6 +49,9 @@ class DashboardFragmentUser : Fragment() {
             recyclerView.adapter = adapter
             adapter.setOnItemClickListener(object : DashboardPostAdapter.onItemClickListener {
                 override fun onItemClick(position: Int) {
+                    val intent = Intent(requireContext(), PostDetailActivity::class.java)
+                    intent.putExtra("EXTID" ,postList[position].id)
+                    startActivity(intent)
                 }
 
                 override fun onBookmarkClick(position: Int) {
@@ -63,6 +62,14 @@ class DashboardFragmentUser : Fragment() {
         }
         //Binding
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetchData()
+
+        //Get User Detail
+        getUserCredential()
     }
 
     private fun getUserCredential() {

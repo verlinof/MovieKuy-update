@@ -15,6 +15,12 @@
         android:theme="@style/Theme.UASPAPB"
         tools:targetApi="31">
         <activity
+            android:name=".admin.DetailAdminActivity"
+            android:exported="false" />
+        <activity
+            android:name=".user.PostDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".admin.EditAdminActivity"
             android:exported="false" />
         <activity

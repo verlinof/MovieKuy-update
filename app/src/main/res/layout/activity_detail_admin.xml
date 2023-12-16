@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".admin.UploadAdminActivity">
+    tools:context=".admin.DetailAdminActivity">
 
     <ImageView
         android:id="@+id/btnBack"
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="Upload"
+        android:text="Edit Post"
         android:textSize="20sp"
         android:fontFamily="@font/poppinsbold"
         android:textColor="@color/text_primary"
@@ -40,68 +40,62 @@
         android:layout_centerVertical="true"
         />
 
-    <RelativeLayout
+    <ScrollView
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/tvTitle"
-        android:layout_above="@id/btnUpload"
+        android:layout_above="@id/btnBookmark"
         android:layout_centerVertical="true"
         android:layout_marginHorizontal="30dp"
         android:layout_marginVertical="30dp"
         >
-        
-        <ImageView
-            android:id="@+id/ivPostImage"
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/no_image_selected"
-            android:scaleType="centerCrop"
-            />
+            android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/btnSelectImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ivPostImage"
-            android:text="Select Image"
-            android:layout_marginTop="15dp"
-            android:layout_centerHorizontal="true"
-            android:backgroundTint="@color/button_primary"
-            />
 
-        <EditText
-            android:id="@+id/etTitle"
-            android:layout_width="match_parent"
-            android:layout_height="45sp"
-            android:background="@drawable/rounded_bg_edittext"
-            android:layout_below="@id/btnSelectImage"
-            android:hint="Title"
-            android:paddingHorizontal="15sp"
-            android:layout_marginTop="15dp"
-            />
+            <ImageView
+                android:id="@+id/ivPostImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/no_image_selected"
+                android:scaleType="centerCrop"
+                />
 
-        <EditText
-            android:id="@+id/etDescription"
-            android:layout_width="match_parent"
-            android:layout_height="100sp"
-            android:layout_below="@id/etTitle"
-            android:background="@drawable/rounded_bg_edittext"
-            android:hint="Description"
-            android:inputType="textMultiLine"
-            android:layout_marginTop="15sp"
-            android:paddingHorizontal="15sp"
-            />
+            <TextView
+                android:id="@+id/tvTitleData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ivPostImage"
+                android:text="Title of Post"
+                android:textSize="18sp"
+                android:fontFamily="@font/poppinssemibold"
+                android:layout_marginTop="15dp"
+                />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvTitleData"
+                android:text="Description of Postt"
+                android:layout_marginTop="10sp"
+                android:fontFamily="@font/poppinsregular"
+                />
+
+        </RelativeLayout>
+
+    </ScrollView>
 
     <Button
-        android:id="@+id/btnUpload"
+        android:id="@+id/btnUpdate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/button_primary"
-        android:text="Upload"
+        android:text="Update"
         android:textSize="15sp"
         android:textStyle="bold"
         android:fontFamily="@font/poppinssemibold"

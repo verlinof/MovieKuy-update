@@ -37,10 +37,6 @@ class DashboardAdminActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         with(binding) {
-            //Function Calling
-            getUserCredential()
-            fetchData()
-
             //Logout
             btnLogout.setOnClickListener {
                 auth.signOut()
@@ -75,6 +71,15 @@ class DashboardAdminActivity : AppCompatActivity() {
 
             })
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        //Function Calling
+        getUserCredential()
+        fetchData()
+
     }
 
     //Function

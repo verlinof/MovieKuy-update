@@ -1,36 +1,95 @@
 package com.example.uaspapb.user
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import com.bumptech.glide.Glide
 import com.example.uaspapb.R
+import com.example.uaspapb.database.PostDao
+import com.example.uaspapb.database.PostDatabase
+import com.example.uaspapb.database.PostRoom
 import com.example.uaspapb.databinding.ActivityPostDetailBinding
 import com.example.uaspapb.model.Post
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class PostDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPostDetailBinding
-    private val firestore = FirebaseFirestore.getInstance()
     private var post: Post? = null
+    //
+    private val firestore = FirebaseFirestore.getInstance()
+    private val currentUser = Firebase.auth.currentUser
+    //Room
+    private lateinit var mPostDao: PostDao
+    private lateinit var executorService: ExecutorService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPostDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //Room
+        executorService = Executors.newSingleThreadExecutor()
+        val db = PostDatabase.getDatabase(this@PostDetailActivity)
+        mPostDao = db!!.postDao()!!
+
         //Call Function
         fetchData()
 
-        //Bookmark
-        binding.btnBookmark.setOnClickListener {
+        val bundle: Bundle? = intent.extras
+        val id = bundle?.getInt("EXTROOMID")
+        val postIdData = bundle?.getString("EXTID")
+        val type = bundle?.getString("EXTTYPE")
 
-        }
-        binding.btnBack.setOnClickListener {
-            startActivity(Intent(this@PostDetailActivity, HomeUserActivity::class.java))
-            finishAffinity()
+        if(type == "dashboard") {
+            //Bookmark
+            binding.btnBookmark.setOnClickListener {
+                insert(
+                    PostRoom(
+                        postId = postIdData!!,
+                        email = currentUser!!.email!!
+                    )
+                )
+                Toast.makeText(this@PostDetailActivity, "Add to Bookmark Success", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this@PostDetailActivity, HomeUserActivity::class.java))
+                finishAffinity()
+            }
+            binding.btnBack.setOnClickListener {
+                startActivity(Intent(this@PostDetailActivity, HomeUserActivity::class.java))
+                finishAffinity()
+            }
+        }else {
+            //Set Bookmark Style
+            binding.btnBookmark.text = "Remove Bookmark"
+            val color = ContextCompat.getColor(this@PostDetailActivity, R.color.red)
+            val colorStateList = ColorStateList.valueOf(color)
+
+            ViewCompat.setBackgroundTintList(binding.btnBookmark, colorStateList)
+
+            //Bookmark
+            binding.btnBookmark.setOnClickListener {
+                deleteBookmark(
+                    PostRoom(
+                        id = id!!,
+                        postId = post!!.id,
+                        email = currentUser!!.email!!
+                    )
+                )
+                Toast.makeText(this@PostDetailActivity, "Remove Bookmark Success", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this@PostDetailActivity, HomeUserActivity::class.java))
+                finishAffinity()
+            }
+            binding.btnBack.setOnClickListener {
+                startActivity(Intent(this@PostDetailActivity, HomeUserActivity::class.java))
+                finishAffinity()
+            }
         }
     }
 
@@ -57,4 +116,13 @@ class PostDetailActivity : AppCompatActivity() {
                 }
         }
     }
+
+    private fun insert(post: PostRoom) {
+        executorService.execute { mPostDao.insert(post) }
+    }
+
+    private fun deleteBookmark(post: PostRoom) {
+        executorService.execute { mPostDao.delete(post) }
+    }
+
 }

@@ -10,6 +10,9 @@ import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.uaspapb.R
+import com.example.uaspapb.database.PostDao
+import com.example.uaspapb.database.PostDatabase
+import com.example.uaspapb.database.PostRoom
 import com.example.uaspapb.databinding.FragmentDashboardUserBinding
 import com.example.uaspapb.databinding.FragmentRegisterBinding
 import com.example.uaspapb.model.Post
@@ -18,14 +21,25 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.lang.Exception
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 
 class DashboardFragmentUser : Fragment() {
     private lateinit var binding: FragmentDashboardUserBinding
     private var postList: ArrayList<Post> = ArrayList<Post>()
+    //Firebase
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = Firebase.auth
     private val currentUser = auth.currentUser
+    private var username: String? = null
+    //Room
+    private lateinit var mPostDao: PostDao
+    private lateinit var executorService: ExecutorService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,9 +51,19 @@ class DashboardFragmentUser : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         binding = FragmentDashboardUserBinding.inflate(inflater)
         with(binding) {
+            CoroutineScope(Dispatchers.Main).launch {
+                //Get User Detail
+                getUserCredential()
+            }
+            fetchData()
+
+            //Room
+            executorService = Executors.newSingleThreadExecutor()
+            val db = PostDatabase.getDatabase(requireContext())
+            mPostDao = db!!.postDao()!!
+
             //RecyclerView
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.setHasFixedSize(true)
@@ -51,10 +75,18 @@ class DashboardFragmentUser : Fragment() {
                 override fun onItemClick(position: Int) {
                     val intent = Intent(requireContext(), PostDetailActivity::class.java)
                     intent.putExtra("EXTID" ,postList[position].id)
+                    intent.putExtra("EXTTYPE" ,"dashboard")
                     startActivity(intent)
                 }
 
                 override fun onBookmarkClick(position: Int) {
+                    val postRoomData = PostRoom(postId =  postList[position].id, email = currentUser!!.email!!)
+                    try{
+                        insert(postRoomData)
+                        Toast.makeText(requireActivity(), "Add to Bookmark Success", Toast.LENGTH_SHORT).show()
+                    }catch (e: Exception) {
+                        Toast.makeText(requireActivity(), "Error : $e", Toast.LENGTH_SHORT).show()
+                    }
                 }
 
             })
@@ -64,14 +96,7 @@ class DashboardFragmentUser : Fragment() {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        fetchData()
-
-        //Get User Detail
-        getUserCredential()
-    }
-
+    //Function
     private fun getUserCredential() {
         //Get User Credentials
         firestore.collection("users").document(currentUser!!.uid)
@@ -79,14 +104,14 @@ class DashboardFragmentUser : Fragment() {
                     document ->
                 if(document != null && document.exists()) {
                     val data = document.data!!
-                    val username = data["username"] as String
+                    username = data["username"] as String
                     binding.tvUsername.text = "Hello $username"
                 }
             }.addOnFailureListener {
                 val username = "username"
                 binding.tvUsername.text = "Hello $username"
 
-                Toast.makeText(requireContext(), "Error : $it", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity(), "Error : $it", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -99,8 +124,13 @@ class DashboardFragmentUser : Fragment() {
                 }
             }
             .addOnFailureListener {exception ->
-                Toast.makeText(requireContext(), "Error : $exception", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity(), "Error : $exception", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    //Room Database
+    private fun insert(post: PostRoom) {
+        executorService.execute { mPostDao.insert(post) }
     }
 
     companion object {

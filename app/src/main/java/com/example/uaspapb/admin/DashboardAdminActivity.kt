@@ -22,6 +22,9 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class DashboardAdminActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeAdminBinding
@@ -37,6 +40,12 @@ class DashboardAdminActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         with(binding) {
+            //Function Calling
+            CoroutineScope(Dispatchers.Main).launch {
+                getUserCredential()
+            }
+            fetchData()
+
             //Logout
             btnLogout.setOnClickListener {
                 auth.signOut()
@@ -71,15 +80,6 @@ class DashboardAdminActivity : AppCompatActivity() {
 
             })
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        //Function Calling
-        getUserCredential()
-        fetchData()
-
     }
 
     //Function

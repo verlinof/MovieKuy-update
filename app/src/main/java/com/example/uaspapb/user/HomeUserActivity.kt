@@ -20,7 +20,7 @@ class HomeUserActivity : AppCompatActivity() {
             navbarUser.setOnItemSelectedListener() {
                 when(it.itemId) {
                     R.id.itemDashboard -> replaceFragment(DashboardFragmentUser())
-                    R.id.itemBookmark -> replaceFragment(DashboardFragmentUser())
+                    R.id.itemBookmark -> replaceFragment(BookmarkFragmentUser())
                     R.id.itemProfile -> replaceFragment(ProfileFragmentUser())
                     else -> {}
                 }
@@ -34,7 +34,7 @@ class HomeUserActivity : AppCompatActivity() {
 
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.frameLayout, fragment)
-
+        fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
 }

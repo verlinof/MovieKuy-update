@@ -4,10 +4,9 @@ import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.checkerframework.common.aliasing.qual.Unique
 
-@Entity("posts")
-data class PostRoom(
+@Entity("posts_bookmark")
+data class PostBookmark(
     @PrimaryKey(true)
     @NonNull
     val id: Int = 0,

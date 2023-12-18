@@ -4,18 +4,14 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import com.bumptech.glide.Glide
-import com.example.uaspapb.R
 import com.example.uaspapb.databinding.ActivityEditAdminBinding
 import com.example.uaspapb.model.Post
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.UploadTask
 
 class EditAdminActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditAdminBinding
@@ -73,7 +69,12 @@ class EditAdminActivity : AppCompatActivity() {
                 .addOnSuccessListener {documentSnapshot ->
                     if(documentSnapshot.exists()) {
                         val data = documentSnapshot.data
-                        post = Post(data!!["id"].toString(), data!!["postImage"].toString(), data!!["postTitle"].toString(), data!!["postDescription"].toString())
+                        post = Post(
+                            data!!["id"].toString(),
+                            data!!["postDescription"].toString(),
+                            data!!["postImage"].toString(),
+                            data!!["postTitle"].toString()
+                        )
 
                         //Set Value
                         Glide.with(binding.ivPostImage)
@@ -103,7 +104,12 @@ class EditAdminActivity : AppCompatActivity() {
                     val downloadUrl = uri.toString()
                     val postTitle = binding.etTitle.text.toString()
                     val postDescription = binding.etDescription.text.toString()
-                    val postData = Post(id = post!!.id, postImage = downloadUrl, postTitle = postTitle, postDescription = postDescription)
+                    val postData = Post(
+                        id = post!!.id,
+                        postDescription = postDescription,
+                        postImage = downloadUrl,
+                        postTitle = postTitle
+                    )
 
                     //Update Firestore
                     firestore.collection("posts")
@@ -128,7 +134,12 @@ class EditAdminActivity : AppCompatActivity() {
     private fun updateDataNoImage() {
         val postTitle = binding.etTitle.text.toString()
         val postDescription = binding.etDescription.text.toString()
-        val postData = Post(id = post!!.id, postImage = post!!.postImage , postTitle = postTitle, postDescription = postDescription)
+        val postData = Post(
+            id = post!!.id,
+            postDescription = postDescription,
+            postImage = post!!.postImage,
+            postTitle = postTitle
+        )
 
         //Update Firestore
         firestore.collection("posts")

@@ -2,10 +2,8 @@ package com.example.uaspapb.admin
 
 import android.content.Intent
 import android.net.Uri
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,7 +12,6 @@ import com.example.uaspapb.model.Post
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import java.util.Date
 
 class UploadAdminActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUploadAdminBinding
@@ -65,7 +62,11 @@ class UploadAdminActivity : AppCompatActivity() {
                 val downloadUrl = uri.toString()
                 val postTitle = binding.etTitle.text.toString()
                 val postDescription = binding.etDescription.text.toString()
-                val post = Post(postImage = downloadUrl, postTitle = postTitle, postDescription = postDescription)
+                val post = Post(
+                    postDescription = postDescription,
+                    postImage = downloadUrl,
+                    postTitle = postTitle
+                )
 
                 fireStore.collection("posts")
                     .add(post)

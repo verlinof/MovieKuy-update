@@ -1,26 +1,26 @@
 package com.example.uaspapb.user
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.uaspapb.R
-import com.example.uaspapb.database.PostDao
+import com.example.uaspapb.database.PostBookmark
+import com.example.uaspapb.database.PostBookmarkDao
 import com.example.uaspapb.database.PostDatabase
-import com.example.uaspapb.database.PostRoom
+import com.example.uaspapb.database.PostLocal
+import com.example.uaspapb.database.PostLocalDao
 import com.example.uaspapb.databinding.FragmentDashboardUserBinding
-import com.example.uaspapb.databinding.FragmentRegisterBinding
 import com.example.uaspapb.model.Post
-import com.example.uaspapb.model.User
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,7 +38,8 @@ class DashboardFragmentUser : Fragment() {
     private val currentUser = auth.currentUser
     private var username: String? = null
     //Room
-    private lateinit var mPostDao: PostDao
+    private lateinit var mPostBookmarkDao: PostBookmarkDao
+    private lateinit var mPostLocalDao: PostLocalDao
     private lateinit var executorService: ExecutorService
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,17 +53,25 @@ class DashboardFragmentUser : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDashboardUserBinding.inflate(inflater)
+
         with(binding) {
+            //Room
+            executorService = Executors.newSingleThreadExecutor()
+            val db = PostDatabase.getDatabase(requireContext())
+            mPostBookmarkDao = db!!.postBookmarkDao()!!
+            mPostLocalDao = db.postLocalDao()!!
+
             CoroutineScope(Dispatchers.Main).launch {
                 //Get User Detail
                 getUserCredential()
             }
-            fetchData()
-
-            //Room
-            executorService = Executors.newSingleThreadExecutor()
-            val db = PostDatabase.getDatabase(requireContext())
-            mPostDao = db!!.postDao()!!
+            if(isInternetAvailable(requireActivity())) {
+                fetchData()
+                Toast.makeText(requireActivity(), "Establishing Connection", Toast.LENGTH_SHORT).show()
+            }else{
+                fetchDataOffline()
+                Toast.makeText(requireActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show()
+            }
 
             //RecyclerView
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -80,7 +89,7 @@ class DashboardFragmentUser : Fragment() {
                 }
 
                 override fun onBookmarkClick(position: Int) {
-                    val postRoomData = PostRoom(postId =  postList[position].id, email = currentUser!!.email!!)
+                    val postRoomData = PostBookmark(postId =  postList[position].id, email = currentUser!!.email!!)
                     try{
                         insert(postRoomData)
                         Toast.makeText(requireActivity(), "Add to Bookmark Success", Toast.LENGTH_SHORT).show()
@@ -115,12 +124,35 @@ class DashboardFragmentUser : Fragment() {
             }
     }
 
+    fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+
+        return capabilities != null &&
+                (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+    }
+
     private fun fetchData() {
+        //Remove all data from Room Database
+        truncatePostLocal()
+
         firestore.collection("posts").get()
             .addOnSuccessListener {documents ->
                 for (document in documents) {
                     val post = document.toObject(Post::class.java)
                     postList.add(post)
+
+                    //Insert ke Room buat nanti data offline
+                    val postLocal = PostLocal(
+                        id = post.id,
+                        postDescription = post.postDescription,
+                        postImage = post.postImage,
+                        postTitle = post.postTitle
+                    )
+                    insertPostsLocal(postLocal)
                 }
             }
             .addOnFailureListener {exception ->
@@ -128,9 +160,35 @@ class DashboardFragmentUser : Fragment() {
             }
     }
 
+    private fun fetchDataOffline() {
+        //Clear previous data
+        postList.clear()
+
+        //Logic
+        mPostLocalDao.allPostsLocal().observe(requireActivity()) {posts ->
+            for(post in posts) {
+                val data = Post(
+                    id = post.id,
+                    postDescription = post.postDescription,
+                    postImage = post.postImage,
+                    postTitle = post.postTitle
+                )
+                postList.add(data)
+            }
+        }
+    }
+
     //Room Database
-    private fun insert(post: PostRoom) {
-        executorService.execute { mPostDao.insert(post) }
+    private fun insert(post: PostBookmark) {
+        executorService.execute { mPostBookmarkDao.insert(post) }
+    }
+
+    private fun insertPostsLocal(post: PostLocal) {
+        executorService.execute { mPostLocalDao.insert(post) }
+    }
+
+    private fun truncatePostLocal() {
+        executorService.execute { mPostLocalDao.truncateTable() }
     }
 
     companion object {

@@ -59,7 +59,7 @@
             <ImageView
                 android:id="@+id/ivPostImage"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="300dp"
                 android:layout_alignParentTop="true"
                 android:src="@drawable/no_image_selected"
                 android:scaleType="centerCrop"

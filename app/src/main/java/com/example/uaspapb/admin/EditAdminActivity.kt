@@ -149,10 +149,8 @@ class EditAdminActivity : AppCompatActivity() {
                 Toast.makeText(this@EditAdminActivity, "Error : $error", Toast.LENGTH_SHORT).show()
             }
         binding.loadingBar.visibility = View.INVISIBLE
-        Toast.makeText(this@EditAdminActivity, "Upload Success", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@EditAdminActivity, "Update Success", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this@EditAdminActivity, DashboardAdminActivity::class.java))
         finishAffinity()
     }
-
-
 }

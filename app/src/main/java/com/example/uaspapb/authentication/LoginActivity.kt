@@ -25,7 +25,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var password: String
     //Notification
     private val channelId = "Login_notification"
-    private val notifId = 90
     private lateinit var notifManager: NotificationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {

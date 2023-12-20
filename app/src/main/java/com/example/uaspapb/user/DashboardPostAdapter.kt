@@ -35,7 +35,12 @@ class DashboardPostAdapter(private val postList: ArrayList<Post>)
             .centerCrop()
             .into(holder.postImage)
         holder.postTitle.text = currentItem.postTitle
-        holder.postDescription.text = currentItem.postDescription
+        //Biar nanti auto kepotong kalo deskripsinya kepanjangan
+        if(currentItem.postDescription.length > 75) {
+            holder.postDescription.text = currentItem.postDescription.subSequence(0, 75)
+        }else{
+            holder.postDescription.text = currentItem.postDescription
+        }
 
     }
 

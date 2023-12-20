@@ -7,7 +7,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.uaspapb.R
@@ -36,7 +35,12 @@ class DashboardPostAdapter(private val postList: ArrayList<Post>)
             .centerCrop()
             .into(holder.postImage)
         holder.postTitle.text = currentItem.postTitle
-        holder.postDescription.text = currentItem.postDescription
+        //Biar nanti auto kepotong kalo deskripsinya kepanjangan
+        if(currentItem.postDescription.length > 75) {
+            holder.postDescription.text = currentItem.postDescription.subSequence(0, 75)
+        }else{
+            holder.postDescription.text = currentItem.postDescription
+        }
 
     }
 

@@ -77,7 +77,7 @@
             android:layout_height="45sp"
             android:background="@drawable/rounded_bg_edittext"
             android:layout_below="@id/btnSelectImage"
-            android:hint="Title"
+            android:hint="Movie Title"
             android:paddingHorizontal="15sp"
             android:layout_marginTop="15dp"
             />
@@ -88,7 +88,7 @@
             android:layout_height="100sp"
             android:layout_below="@id/etTitle"
             android:background="@drawable/rounded_bg_edittext"
-            android:hint="Description"
+            android:hint="Movie Description"
             android:inputType="textMultiLine"
             android:layout_marginTop="15sp"
             android:paddingHorizontal="15sp"

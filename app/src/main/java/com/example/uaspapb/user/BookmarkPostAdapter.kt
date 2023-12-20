@@ -41,7 +41,11 @@ class BookmarkPostAdapter(private val postList: ArrayList<Post>, private val con
             .centerCrop()
             .into(holder.postImage)
         holder.postTitle.text = currentItem.postTitle
-        holder.postDescription.text = currentItem.postDescription
+        if(currentItem.postDescription.length > 75) {
+            holder.postDescription.text = currentItem.postDescription.subSequence(0, 75)
+        }else{
+            holder.postDescription.text = currentItem.postDescription
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarkPostViewHolder {

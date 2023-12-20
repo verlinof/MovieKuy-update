@@ -1,10 +1,10 @@
 package com.example.uaspapb.admin
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import com.bumptech.glide.Glide
-import com.example.uaspapb.R
 import com.example.uaspapb.databinding.ActivityDetailAdminBinding
 import com.example.uaspapb.model.Post
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,7 +25,8 @@ class DetailAdminActivity : AppCompatActivity() {
         binding.loadingBar.visibility = View.VISIBLE
 
         binding.btnBack.setOnClickListener {
-
+            startActivity(Intent(this@DetailAdminActivity, DashboardAdminActivity::class.java))
+            finishAffinity()
         }
     }
 
@@ -39,7 +40,12 @@ class DetailAdminActivity : AppCompatActivity() {
                 .addOnSuccessListener {documentSnapshot ->
                     if(documentSnapshot.exists()) {
                         val data = documentSnapshot.data
-                        post = Post(data!!["id"].toString(), data!!["postImage"].toString(), data!!["postTitle"].toString(), data!!["postDescription"].toString())
+                        post = Post(
+                            data!!["id"].toString(),
+                            data!!["postDescription"].toString(),
+                            data!!["postImage"].toString(),
+                            data!!["postTitle"].toString()
+                        )
 
                         //Set Value
                         Glide.with(binding.ivPostImage)

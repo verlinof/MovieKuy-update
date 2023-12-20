@@ -9,9 +9,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import com.bumptech.glide.Glide
 import com.example.uaspapb.R
-import com.example.uaspapb.database.PostDao
+import com.example.uaspapb.database.PostBookmark
+import com.example.uaspapb.database.PostBookmarkDao
 import com.example.uaspapb.database.PostDatabase
-import com.example.uaspapb.database.PostRoom
 import com.example.uaspapb.databinding.ActivityPostDetailBinding
 import com.example.uaspapb.model.Post
 import com.google.firebase.Firebase
@@ -27,7 +27,7 @@ class PostDetailActivity : AppCompatActivity() {
     private val firestore = FirebaseFirestore.getInstance()
     private val currentUser = Firebase.auth.currentUser
     //Room
-    private lateinit var mPostDao: PostDao
+    private lateinit var mPostBookmarkDao: PostBookmarkDao
     private lateinit var executorService: ExecutorService
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +38,7 @@ class PostDetailActivity : AppCompatActivity() {
         //Room
         executorService = Executors.newSingleThreadExecutor()
         val db = PostDatabase.getDatabase(this@PostDetailActivity)
-        mPostDao = db!!.postDao()!!
+        mPostBookmarkDao = db!!.postBookmarkDao()!!
 
         //Call Function
         fetchData()
@@ -48,11 +48,12 @@ class PostDetailActivity : AppCompatActivity() {
         val postIdData = bundle?.getString("EXTID")
         val type = bundle?.getString("EXTTYPE")
 
+        //Ini kalo ngaksesnya dari dashboard
         if(type == "dashboard") {
             //Bookmark
             binding.btnBookmark.setOnClickListener {
                 insert(
-                    PostRoom(
+                    PostBookmark(
                         postId = postIdData!!,
                         email = currentUser!!.email!!
                     )
@@ -65,7 +66,9 @@ class PostDetailActivity : AppCompatActivity() {
                 startActivity(Intent(this@PostDetailActivity, HomeUserActivity::class.java))
                 finishAffinity()
             }
-        }else {
+        }
+        //Ini kalo ngaksesnya dari bookmark
+        else {
             //Set Bookmark Style
             binding.btnBookmark.text = "Remove Bookmark"
             val color = ContextCompat.getColor(this@PostDetailActivity, R.color.red)
@@ -76,7 +79,7 @@ class PostDetailActivity : AppCompatActivity() {
             //Bookmark
             binding.btnBookmark.setOnClickListener {
                 deleteBookmark(
-                    PostRoom(
+                    PostBookmark(
                         id = id!!,
                         postId = post!!.id,
                         email = currentUser!!.email!!
@@ -103,7 +106,12 @@ class PostDetailActivity : AppCompatActivity() {
                 .addOnSuccessListener {documentSnapshot ->
                     if(documentSnapshot.exists()) {
                         val data = documentSnapshot.data
-                        post = Post(data!!["id"].toString(), data!!["postImage"].toString(), data!!["postTitle"].toString(), data!!["postDescription"].toString())
+                        post = Post(
+                            data!!["id"].toString(),
+                            data!!["postDescription"].toString(),
+                            data!!["postImage"].toString(),
+                            data!!["postTitle"].toString()
+                        )
 
                         //Set Value
                         Glide.with(binding.ivPostImage)
@@ -117,12 +125,12 @@ class PostDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun insert(post: PostRoom) {
-        executorService.execute { mPostDao.insert(post) }
+    private fun insert(post: PostBookmark) {
+        executorService.execute { mPostBookmarkDao.insert(post) }
     }
 
-    private fun deleteBookmark(post: PostRoom) {
-        executorService.execute { mPostDao.delete(post) }
+    private fun deleteBookmark(post: PostBookmark) {
+        executorService.execute { mPostBookmarkDao.delete(post) }
     }
 
 }

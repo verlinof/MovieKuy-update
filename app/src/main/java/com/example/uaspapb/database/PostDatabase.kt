@@ -5,9 +5,10 @@ import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 
-@Database(entities = [PostRoom::class], version = 1, exportSchema = false)
+@Database(entities = [PostBookmark::class, PostLocal::class], version = 1, exportSchema = false)
 abstract class PostDatabase : RoomDatabase() {
-    abstract fun postDao(): PostDao?
+    abstract fun postBookmarkDao(): PostBookmarkDao?
+    abstract fun postLocalDao(): PostLocalDao?
     companion object{
         @Volatile
         private var INSTANCE: PostDatabase? = null

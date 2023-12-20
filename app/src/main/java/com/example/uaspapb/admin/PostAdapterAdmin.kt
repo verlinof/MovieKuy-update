@@ -35,8 +35,11 @@ class PostAdapterAdmin(private val postList: ArrayList<Post>)
             .centerCrop()
             .into(holder.postImage)
         holder.postTitle.text = currentItem.postTitle
-        holder.postDescription.text = currentItem.postDescription
-
+        if(currentItem.postDescription.length > 75) {
+            holder.postDescription.text = currentItem.postDescription.subSequence(0, 75)
+        }else{
+            holder.postDescription.text = currentItem.postDescription
+        }
     }
 
     fun setOnItemClickListener(listener: onItemClickListener){

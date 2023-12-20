@@ -2,6 +2,7 @@ package com.example.uaspapb
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.provider.ContactsContract.CommonDataKinds.Email
 
 class Helper(context: Context) {
     private val sharedPreferences: SharedPreferences =
@@ -25,7 +26,7 @@ class Helper(context: Context) {
     }
 
     fun getUsername(): String? {
-        val username = sharedPreferences.getString("username", null)
+        val username = sharedPreferences.getString("username", "username")
         return username
     }
 

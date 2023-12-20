@@ -1,9 +1,18 @@
 package com.example.uaspapb
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import com.example.uaspapb.admin.DashboardAdminActivity
 import com.example.uaspapb.authentication.AuthenticationActivity
 import com.example.uaspapb.authentication.LoginActivity
@@ -23,6 +32,9 @@ class MainActivity : AppCompatActivity() {
         val firestore = FirebaseFirestore.getInstance()
         val auth = Firebase.auth
         val currentUser = auth.currentUser
+
+        // Cek dan request permission notifikasi
+        requestNotificationPermission()
 
         with(binding) {
             //Check User has been login or not
@@ -59,6 +71,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+        }
+    }
+
+    //Request Permissions
+    private fun requestNotificationPermission() {
+        if(Build.VERSION.SDK_INT  >= Build.VERSION_CODES.TIRAMISU) {
+            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                val REQUEST_NOTIFICATION_PERMISSION = 1
+                ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATION_PERMISSION)
+            }
         }
     }
 }

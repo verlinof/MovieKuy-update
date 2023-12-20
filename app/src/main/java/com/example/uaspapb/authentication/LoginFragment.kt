@@ -1,5 +1,8 @@
 package com.example.uaspapb.authentication
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.example.uaspapb.Helper
 import com.example.uaspapb.MainActivity
 import com.example.uaspapb.R
@@ -33,6 +38,10 @@ class LoginFragment : Fragment() {
     private lateinit var helper: Helper
     private lateinit var email: String
     private lateinit var password: String
+    //Notification
+    private val channelId = "Login_notification"
+    private val notifId = 90
+    private lateinit var notifManager: NotificationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +60,9 @@ class LoginFragment : Fragment() {
 
         //Helper
         helper = Helper(requireContext())
+
+        //Notification
+        notifManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         with(binding) {
             email = etEmail.text.toString()
@@ -85,11 +97,18 @@ class LoginFragment : Fragment() {
                     val userData = document.data!!
 
                     val role = userData["role"] as String
+                    val username = userData["username"] as String
                     if(role == "user") {
+                        //SharedPreferences
+                        helper.setUsername(username)
+
                         Toast.makeText(requireContext(), "Login Success", Toast.LENGTH_SHORT).show()
                         val intent = Intent(requireContext(), HomeUserActivity::class.java)
                         startActivity(intent)
                         activity?.finishAffinity()
+
+                        //Notification
+                        showNotification()
                     }else {
                         Toast.makeText(requireContext(), "User Account Not Found", Toast.LENGTH_SHORT).show()
                     }
@@ -110,6 +129,27 @@ class LoginFragment : Fragment() {
         }
 
         return true
+    }
+
+    private fun showNotification() {
+        val currentUser = Firebase.auth.currentUser
+        val email = currentUser?.email
+
+        val builder = NotificationCompat.Builder(requireContext(), channelId)
+            .setContentTitle("Login Status")
+            .setSmallIcon(R.drawable.ic_notification_24)
+            .setContentText("Welcome back, $email")
+            .setAutoCancel(true)
+
+        val notifChannel = NotificationChannel(
+            channelId,
+            "Notifku",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        with(notifManager) {
+            createNotificationChannel(notifChannel)
+            notify(0, builder.build())
+        }
     }
 
     companion object {

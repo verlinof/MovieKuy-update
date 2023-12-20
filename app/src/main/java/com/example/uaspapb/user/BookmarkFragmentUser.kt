@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.uaspapb.Helper
 import com.example.uaspapb.R
 import com.example.uaspapb.database.PostBookmark
 import com.example.uaspapb.database.PostBookmarkDao
@@ -29,6 +30,7 @@ class BookmarkFragmentUser : Fragment() {
     private var postList: ArrayList<Post> = ArrayList<Post>()
     private var postRoomList: ArrayList<PostBookmark> = ArrayList<PostBookmark>()
     private var postIdList: ArrayList<String> = ArrayList<String>()
+    private lateinit var helper: Helper
     //Firebase
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = Firebase.auth
@@ -48,6 +50,10 @@ class BookmarkFragmentUser : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentBookmarkUserBinding.inflate(layoutInflater)
+
+        //Helper
+        helper = Helper(requireContext())
+
         //Room
         executorService = Executors.newSingleThreadExecutor()
         val db = PostDatabase.getDatabase(requireActivity().applicationContext)
@@ -56,9 +62,13 @@ class BookmarkFragmentUser : Fragment() {
         with(binding) {
             //Get user data dan Fetching Data
             CoroutineScope(Dispatchers.Main).launch {
-                getUserCredential()
+//                getUserCredential()
             }
             allPostsByEmail(currentUser!!.email!!)
+
+            //Get User Credential
+            val username = helper.getUsername()
+            tvUsername.text = "Hello $username"
         }
 
         // Inflate the layout for this fragment
@@ -66,25 +76,6 @@ class BookmarkFragmentUser : Fragment() {
     }
 
     //Function
-    private suspend fun getUserCredential() {
-        //Get User Credentials
-        firestore.collection("users").document(currentUser!!.uid)
-            .get().addOnSuccessListener {
-                    document ->
-                if(document != null && document.exists()) {
-                    val data = document.data!!
-                    val username = data["username"] as String
-
-                    binding.tvUsername.text = "Hello $username"
-                }
-            }.addOnFailureListener {
-                val username = "username"
-                binding.tvUsername.text = "Hello $username"
-
-                Toast.makeText(requireActivity().applicationContext, "Error : $it", Toast.LENGTH_SHORT).show()
-            }
-    }
-
     private fun fetchData() {
         if(postIdList.size !=  0) {
             firestore.collection("posts").whereIn("id", postIdList)
@@ -93,36 +84,40 @@ class BookmarkFragmentUser : Fragment() {
                     for(document in documents) {
                         postList.add(document.toObject(Post::class.java))
                     }
-                    //RecyclerView
-                    binding.recyclerView.layoutManager = LinearLayoutManager(requireActivity().applicationContext)
-                    binding.recyclerView.setHasFixedSize(true)
-                    //Adapter RecyclerView
-                    val adapter = BookmarkPostAdapter(postList, requireActivity().applicationContext)
-                    binding.recyclerView.adapter = adapter
-                    adapter?.setOnItemClickListener(object : BookmarkPostAdapter.onItemClickListener {
-                        override fun onItemClick(position: Int) {
-                            val intent = Intent(requireContext(), PostDetailActivity::class.java)
-                            intent.putExtra("EXTID" ,postList[position].id)
-                            intent.putExtra("EXTROOMID" ,postRoomList[position].id)
-                            intent.putExtra("EXTTYPE" ,"bookmark")
-                            startActivity(intent)
-                        }
-
-                        override fun onBookmarkClick(position: Int) {
-                            replaceFragment(this@BookmarkFragmentUser)
-                            deleteBookmark(postRoomList[position])
-                            postIdList.clear()
-                            postRoomList.clear()
-                            postList.clear()
-                        }
-
-                    })
-
+                    showData()
                 }
                 .addOnFailureListener {exception ->
                     Toast.makeText(requireActivity().applicationContext, "Error : $exception", Toast.LENGTH_SHORT).show()
                 }
         }
+    }
+
+    //Update Recyclerview
+    private fun showData() {
+        //RecyclerView
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireActivity().applicationContext)
+        binding.recyclerView.setHasFixedSize(true)
+        //Adapter RecyclerView
+        val adapter = BookmarkPostAdapter(postList, requireActivity().applicationContext)
+        binding.recyclerView.adapter = adapter
+        adapter?.setOnItemClickListener(object : BookmarkPostAdapter.onItemClickListener {
+            override fun onItemClick(position: Int) {
+                val intent = Intent(requireContext(), PostDetailActivity::class.java)
+                intent.putExtra("EXTID" ,postList[position].id)
+                intent.putExtra("EXTROOMID" ,postRoomList[position].id)
+                intent.putExtra("EXTTYPE" ,"bookmark")
+                startActivity(intent)
+            }
+
+            override fun onBookmarkClick(position: Int) {
+                replaceFragment(this@BookmarkFragmentUser)
+                deleteBookmark(postRoomList[position])
+                postIdList.clear()
+                postRoomList.clear()
+                postList.clear()
+            }
+
+        })
     }
 
     private fun allPostsByEmail(emailData: String) {

@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.uaspapb.Helper
 import com.example.uaspapb.database.PostBookmark
 import com.example.uaspapb.database.PostBookmarkDao
 import com.example.uaspapb.database.PostDatabase
@@ -32,6 +33,7 @@ import java.util.concurrent.Executors
 class DashboardFragmentUser : Fragment() {
     private lateinit var binding: FragmentDashboardUserBinding
     private var postList: ArrayList<Post> = ArrayList<Post>()
+    private lateinit var helper: Helper
     //Firebase
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = Firebase.auth
@@ -54,6 +56,9 @@ class DashboardFragmentUser : Fragment() {
     ): View? {
         binding = FragmentDashboardUserBinding.inflate(inflater)
 
+        //Helper
+        helper = Helper(requireContext())
+
         with(binding) {
             //Room
             executorService = Executors.newSingleThreadExecutor()
@@ -62,9 +67,12 @@ class DashboardFragmentUser : Fragment() {
             mPostLocalDao = db.postLocalDao()!!
 
             CoroutineScope(Dispatchers.Main).launch {
-                //Get User Detail
-                getUserCredential()
+                //Get User Credential
+                val username = helper.getUsername()
+                binding.tvUsername.text = "Hello $username"
             }
+
+            //Check internet and Fetch Data
             if(isInternetAvailable(requireActivity())) {
                 fetchData()
                 Toast.makeText(requireActivity(), "Establishing Connection", Toast.LENGTH_SHORT).show()
@@ -73,58 +81,13 @@ class DashboardFragmentUser : Fragment() {
                 Toast.makeText(requireActivity(), "No Internet Connection", Toast.LENGTH_SHORT).show()
             }
 
-            //RecyclerView
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
-            recyclerView.setHasFixedSize(true)
-
-            //Adapter RecyclerView
-            val adapter = DashboardPostAdapter(postList)
-            recyclerView.adapter = adapter
-            adapter.setOnItemClickListener(object : DashboardPostAdapter.onItemClickListener {
-                override fun onItemClick(position: Int) {
-                    val intent = Intent(requireContext(), PostDetailActivity::class.java)
-                    intent.putExtra("EXTID" ,postList[position].id)
-                    intent.putExtra("EXTTYPE" ,"dashboard")
-                    startActivity(intent)
-                }
-
-                override fun onBookmarkClick(position: Int) {
-                    val postRoomData = PostBookmark(postId =  postList[position].id, email = currentUser!!.email!!)
-                    try{
-                        insert(postRoomData)
-                        Toast.makeText(requireActivity(), "Add to Bookmark Success", Toast.LENGTH_SHORT).show()
-                    }catch (e: Exception) {
-                        Toast.makeText(requireActivity(), "Error : $e", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-            })
-
         }
         //Binding
         return binding.root
     }
 
     //Function
-    private fun getUserCredential() {
-        //Get User Credentials
-        firestore.collection("users").document(currentUser!!.uid)
-            .get().addOnSuccessListener {
-                    document ->
-                if(document != null && document.exists()) {
-                    val data = document.data!!
-                    username = data["username"] as String
-                    binding.tvUsername.text = "Hello $username"
-                }
-            }.addOnFailureListener {
-                val username = "username"
-                binding.tvUsername.text = "Hello $username"
-
-                Toast.makeText(requireActivity(), "Error : $it", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    fun isInternetAvailable(context: Context): Boolean {
+    private fun isInternetAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         val network = connectivityManager.activeNetwork
@@ -154,6 +117,8 @@ class DashboardFragmentUser : Fragment() {
                     )
                     insertPostsLocal(postLocal)
                 }
+                //Update recyclerview
+                showData()
             }
             .addOnFailureListener {exception ->
                 Toast.makeText(requireActivity(), "Error : $exception", Toast.LENGTH_SHORT).show()
@@ -175,7 +140,38 @@ class DashboardFragmentUser : Fragment() {
                 )
                 postList.add(data)
             }
+            //Update recyclerview
+            showData()
         }
+    }
+
+    private fun showData() {
+        //RecyclerView
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.setHasFixedSize(true)
+
+        //Adapter RecyclerView
+        val adapter = DashboardPostAdapter(postList)
+        binding.recyclerView.adapter = adapter
+        adapter.setOnItemClickListener(object : DashboardPostAdapter.onItemClickListener {
+            override fun onItemClick(position: Int) {
+                val intent = Intent(requireContext(), PostDetailActivity::class.java)
+                intent.putExtra("EXTID" ,postList[position].id)
+                intent.putExtra("EXTTYPE" ,"dashboard")
+                startActivity(intent)
+            }
+
+            override fun onBookmarkClick(position: Int) {
+                val postRoomData = PostBookmark(postId =  postList[position].id, email = currentUser!!.email!!)
+                try{
+                    insert(postRoomData)
+                    Toast.makeText(requireActivity(), "Add to Bookmark Success", Toast.LENGTH_SHORT).show()
+                }catch (e: Exception) {
+                    Toast.makeText(requireActivity(), "Error : $e", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        })
     }
 
     //Room Database

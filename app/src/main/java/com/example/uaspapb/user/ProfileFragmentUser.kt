@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.example.uaspapb.Helper
 import com.example.uaspapb.MainActivity
 import com.example.uaspapb.R
 import com.example.uaspapb.databinding.FragmentDashboardUserBinding
@@ -27,9 +28,10 @@ private const val ARG_PARAM2 = "param2"
  */
 class ProfileFragmentUser : Fragment() {
     private lateinit var binding: FragmentProfileUserBinding
+    private lateinit var helper: Helper
+    //Firebase
     private val auth = Firebase.auth
     private val currentUser = auth.currentUser
-    private val firestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,24 +45,14 @@ class ProfileFragmentUser : Fragment() {
     ): View? {
         binding = FragmentProfileUserBinding.inflate(layoutInflater)
 
+        //Helper
+        helper = Helper(requireContext())
+
         with(binding) {
             //Get User Credentials
             tvEmail.text = currentUser?.email
-
-            firestore.collection("users").document(currentUser!!.uid)
-                .get().addOnSuccessListener {
-                        document ->
-                    if(document != null && document.exists()) {
-                        val data = document.data!!
-                        val username = data["username"] as String
-                        tvUsername.text = username
-                    }
-                }.addOnFailureListener {
-                    val username = "username"
-                    tvUsername.text = username
-
-                    Toast.makeText(requireContext(), "Error : $it", Toast.LENGTH_SHORT).show()
-                }
+            val username = helper.getUsername()
+            tvUsername.text = username
 
             btnLogout.setOnClickListener {
                 auth.signOut()

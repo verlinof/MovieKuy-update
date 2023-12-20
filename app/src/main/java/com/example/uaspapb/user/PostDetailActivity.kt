@@ -48,6 +48,7 @@ class PostDetailActivity : AppCompatActivity() {
         val postIdData = bundle?.getString("EXTID")
         val type = bundle?.getString("EXTTYPE")
 
+        //Ini kalo ngaksesnya dari dashboard
         if(type == "dashboard") {
             //Bookmark
             binding.btnBookmark.setOnClickListener {
@@ -65,7 +66,9 @@ class PostDetailActivity : AppCompatActivity() {
                 startActivity(Intent(this@PostDetailActivity, HomeUserActivity::class.java))
                 finishAffinity()
             }
-        }else {
+        }
+        //Ini kalo ngaksesnya dari bookmark
+        else {
             //Set Bookmark Style
             binding.btnBookmark.text = "Remove Bookmark"
             val color = ContextCompat.getColor(this@PostDetailActivity, R.color.red)

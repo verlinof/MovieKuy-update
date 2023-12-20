@@ -10,6 +10,7 @@ import android.view.View
 import android.view.Window
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.uaspapb.Helper
 import com.example.uaspapb.MainActivity
 import com.example.uaspapb.database.PostBookmarkDao
 import com.example.uaspapb.database.PostDatabase
@@ -30,6 +31,7 @@ import java.util.concurrent.Executors
 
 class DashboardAdminActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeAdminBinding
+    private lateinit var helper: Helper
     //Firebase
     private val auth = Firebase.auth
     private val currentUser = auth.currentUser
@@ -45,6 +47,9 @@ class DashboardAdminActivity : AppCompatActivity() {
         binding = ActivityHomeAdminBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //Helper
+        helper = Helper(this@DashboardAdminActivity)
+
         //Room
         executorService = Executors.newSingleThreadExecutor()
         val db = PostDatabase.getDatabase(this@DashboardAdminActivity.applicationContext)
@@ -52,10 +57,11 @@ class DashboardAdminActivity : AppCompatActivity() {
 
         with(binding) {
             //Function Calling
-            CoroutineScope(Dispatchers.Main).launch {
-                getUserCredential()
-            }
             fetchData()
+
+            //Get user credential
+            val username = helper.getUsername()
+            tvUsername.text = "Hello $username"
 
             //Logout
             btnLogout.setOnClickListener {
@@ -70,51 +76,10 @@ class DashboardAdminActivity : AppCompatActivity() {
                 startActivity(intent)
             }
 
-            //RecyclerView
-            recyclerView.layoutManager = LinearLayoutManager(this@DashboardAdminActivity)
-            recyclerView.setHasFixedSize(true)
-            val adapter = PostAdapterAdmin(postList)
-            recyclerView.adapter = adapter
-            adapter.setOnItemClickListener(object: PostAdapterAdmin.onItemClickListener {
-                override fun onItemClick(position: Int) {
-                    val intent = Intent(this@DashboardAdminActivity, DetailAdminActivity::class.java)
-                    intent.putExtra("EXTID" ,postList[position].id)
-                    startActivity(intent)
-                }
-
-                override fun onEditClick(position: Int) {
-                    val intent = Intent(this@DashboardAdminActivity, EditAdminActivity::class.java)
-                    intent.putExtra("EXTID", postList[position].id)
-                    startActivity(intent)
-                }
-
-                override fun onDeleteClick(position: Int) {
-                    showCustomDialog(position)
-                }
-
-            })
         }
     }
 
     //Function
-    private fun getUserCredential() {
-        //Get User Credentials
-        firestore.collection("users").document(currentUser!!.uid)
-            .get().addOnSuccessListener {
-                    document ->
-                if(document != null && document.exists()) {
-                    val data = document.data!!
-                    val username = data["username"] as String
-                    binding.tvUsername.text = "Hello $username"
-                }
-            }.addOnFailureListener {
-                val username = "username"
-                binding.tvUsername.text = "Hello $username"
-
-                Toast.makeText(this@DashboardAdminActivity, "Error : $it", Toast.LENGTH_SHORT).show()
-            }
-    }
-
     private fun fetchData() {
         //Clear previous data
         postList.clear()
@@ -125,10 +90,37 @@ class DashboardAdminActivity : AppCompatActivity() {
                     val post = document.toObject(Post::class.java)
                     postList.add(post)
                 }
+                showData()
             }
             .addOnFailureListener {exception ->
                 Toast.makeText(this@DashboardAdminActivity, "Error : $exception", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun showData() {
+        //RecyclerView
+        binding.recyclerView.layoutManager = LinearLayoutManager(this@DashboardAdminActivity)
+        binding.recyclerView.setHasFixedSize(true)
+        val adapter = PostAdapterAdmin(postList)
+        binding.recyclerView.adapter = adapter
+        adapter.setOnItemClickListener(object: PostAdapterAdmin.onItemClickListener {
+            override fun onItemClick(position: Int) {
+                val intent = Intent(this@DashboardAdminActivity, DetailAdminActivity::class.java)
+                intent.putExtra("EXTID" ,postList[position].id)
+                startActivity(intent)
+            }
+
+            override fun onEditClick(position: Int) {
+                val intent = Intent(this@DashboardAdminActivity, EditAdminActivity::class.java)
+                intent.putExtra("EXTID", postList[position].id)
+                startActivity(intent)
+            }
+
+            override fun onDeleteClick(position: Int) {
+                showCustomDialog(position)
+            }
+
+        })
     }
 
     private fun deletePost(position: Int) {

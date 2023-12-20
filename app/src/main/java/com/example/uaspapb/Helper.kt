@@ -30,15 +30,4 @@ class Helper(context: Context) {
         return username
     }
 
-    fun setEmail(email: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString("username", email)
-        editor.apply()
-    }
-
-    fun getEmail(): String? {
-        val username = sharedPreferences.getString("username", "username")
-        return username
-    }
-
 }

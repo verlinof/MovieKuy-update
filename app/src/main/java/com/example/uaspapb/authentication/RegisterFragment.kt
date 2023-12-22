@@ -70,6 +70,7 @@ class RegisterFragment : Fragment() {
         firebase.collection("users").document(user.uid)
             .set(userData)
             .addOnCompleteListener {
+                helper.setUsername(binding.etUsername.text.toString())
                 Toast.makeText(requireContext(), "Account has been created successfully", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->

@@ -77,14 +77,14 @@ class UploadAdminActivity : AppCompatActivity() {
                             .addOnFailureListener { error ->
                                 Toast.makeText(this@UploadAdminActivity, "Error : $error", Toast.LENGTH_SHORT).show()
                             }
+                        binding.loadingBar.visibility = View.INVISIBLE
+                        Toast.makeText(this@UploadAdminActivity, "Upload Success", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this@UploadAdminActivity, DashboardAdminActivity::class.java))
+                        finishAffinity()
                     }
                     .addOnFailureListener {error ->
                         Toast.makeText(this@UploadAdminActivity, "Error : $error", Toast.LENGTH_SHORT).show()
                     }
-                binding.loadingBar.visibility = View.INVISIBLE
-                Toast.makeText(this@UploadAdminActivity, "Upload Success", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this@UploadAdminActivity, DashboardAdminActivity::class.java))
-                finishAffinity()
             }
         }
     }

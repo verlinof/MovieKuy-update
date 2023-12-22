@@ -105,6 +105,7 @@ class DashboardFragmentUser : Fragment() {
         firestore.collection("posts").get()
             .addOnSuccessListener {documents ->
                 for (document in documents) {
+                    //Online
                     val post = document.toObject(Post::class.java)
                     postList.add(post)
 
